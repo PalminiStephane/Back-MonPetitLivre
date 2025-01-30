@@ -234,6 +234,14 @@ class BookController extends AbstractController
                 ], 403);
             }
 
+            // Vérifier si le livre a des commandes
+            if (!$book->getOrders()->isEmpty()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Cannot delete a book that has orders'
+                ], 400);
+            }
+
             $this->entityManager->remove($book);
             $this->entityManager->flush();
 
