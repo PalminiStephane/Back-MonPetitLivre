@@ -157,4 +157,96 @@ class BookController extends AbstractController
             ], 500);
         }
     }
+
+    /**
+     * @Route("/{id}", name="update", methods={"PUT"})
+     */
+    public function update(Request $request, Book $book): JsonResponse
+    {
+        try {
+            if ($book->getUser() !== $this->getUser()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Access denied'
+                ], 403);
+            }
+
+            $data = json_decode($request->getContent(), true);
+            
+            if (!$data) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Invalid JSON data'
+                ], 400);
+            }
+
+            $book->setTitle($data['title'] ?? $book->getTitle());
+            $book->setChildName($data['child_name'] ?? $book->getChildName());
+            $book->setChildAge($data['child_age'] ?? $book->getChildAge());
+            $book->setTheme($data['theme'] ?? $book->getTheme());
+
+            $errors = $this->validator->validate($book);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
+                }
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $errorMessages
+                ], 400);
+            }
+
+            $this->entityManager->flush();
+
+            return $this->json([
+                'status' => 'success',
+                'message' => 'Book updated successfully',
+                'data' => [
+                    'id' => $book->getId(),
+                    'title' => $book->getTitle(),
+                    'child_name' => $book->getChildName(),
+                    'child_age' => $book->getChildAge(),
+                    'theme' => $book->getTheme(),
+                    'status' => $book->getStatus()
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @Route("/{id}", name="delete", methods={"DELETE"})
+     */
+    public function delete(Book $book): JsonResponse
+    {
+        try {
+            if ($book->getUser() !== $this->getUser()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Access denied'
+                ], 403);
+            }
+
+            $this->entityManager->remove($book);
+            $this->entityManager->flush();
+
+            return $this->json([
+                'status' => 'success',
+                'message' => 'Book deleted successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
