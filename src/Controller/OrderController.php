@@ -172,4 +172,108 @@ class OrderController extends AbstractController
             ], 500);
         }
     }
+    /**
+     * @Route("/{id}", name="update", methods={"PUT"})
+     */
+    public function update(Request $request, Order $order): JsonResponse
+    {
+        try {
+            if ($order->getUser() !== $this->getUser()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Access denied'
+                ], 403);
+            }
+
+            // Vérifier si la commande peut être modifiée
+            if ($order->getStatus() !== 'pending') {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Only pending orders can be updated'
+                ], 400);
+            }
+
+            $data = json_decode($request->getContent(), true);
+            
+            if (!$data) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Invalid JSON data'
+                ], 400);
+            }
+
+            $order->setFormat($data['format'] ?? $order->getFormat());
+            $order->setShippingAdress($data['shipping_address'] ?? $order->getShippingAdress());
+
+            $errors = $this->validator->validate($order);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
+                }
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $errorMessages
+                ], 400);
+            }
+
+            $this->entityManager->flush();
+
+            return $this->json([
+                'status' => 'success',
+                'message' => 'Order updated successfully',
+                'data' => [
+                    'id' => $order->getId(),
+                    'format' => $order->getFormat(),
+                    'status' => $order->getStatus(),
+                    'shipping_address' => $order->getShippingAdress(),
+                    'total_amount' => $order->getTotalAmount()
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @Route("/{id}", name="delete", methods={"DELETE"})
+     */
+    public function delete(Order $order): JsonResponse
+    {
+        try {
+            if ($order->getUser() !== $this->getUser()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Access denied'
+                ], 403);
+            }
+
+            // Vérifier si la commande peut être supprimée
+            if ($order->getStatus() !== 'pending') {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Only pending orders can be deleted'
+                ], 400);
+            }
+
+            $this->entityManager->remove($order);
+            $this->entityManager->flush();
+
+            return $this->json([
+                'status' => 'success',
+                'message' => 'Order deleted successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
