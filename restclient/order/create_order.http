@@ -1,6 +1,5 @@
-### Créer une commande
 POST http://localhost:8000/api/orders
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MzgyNDY2ODUsImV4cCI6MTczODI1MDI4NSwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20ifQ.t8CJ9o7mHUBiON6jLAmSUztDRHehekco99Y2jkEnos-KMPAPFc92QGdAM76csKkfwAxrdHtZrpDUvreKPtDxkL_GVr8GgSyE6NG1fusuF10WaHg5zXhTXiPx-Mmw0zcruUC-EjLqIq49V3MuAX-Mh-4QjTMn0uo-kEdWk6LHJHLG5Nf124eLjD3ZpQWqQRUVJhgdRfrGYI_3G9GvwMPaNN3kc8ZfnJST44aHop8rAvPdo0RmtwgRpW5-Wr_QHBH2bBqSOhdBnAFxK3uQRJbOl4oneC76csFBXDpvCQzFJkgTba_0e3FvUNmSFjXyMGvXPlnxcmPmv3EGS8JGgAB39A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MzgyODI3NzMsImV4cCI6MTczODI4NjM3Mywicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20ifQ.N3xRYV3Z2E3IBJqHdCFbWeCunTD-6Co6so2GTkMCilKqU8EIqjxxcHbjP6wgXZ2S9L1ymEO7ta5XzxhG6s2dzqqoL_HVOARFAJbnqar5i87Q5OXiMXzCf5ZWud295tkSYv9X0E07wTlv4PEEUiXPiNoQe7acpIVijce_NQXXAUhfQ0SEPAUKT6k6_AYg-Cks6rUH9HvlUla9LRfXw0qpjzoC_bT2OPpPd74mcfm0g1DyI1BJJ0jiV99K0uG1myvyaVr_JMZEvr-DbHM_XMuqC9x-gn0U-C0yhS_yy16eqzlZ_vgUt2qcN63LEyCCzZUFIz5EogHeNhCn326DaZ3uCA
 Content-Type: application/json
 
 {
@@ -11,6 +10,5 @@ Content-Type: application/json
         "city": "Paris",
         "postal_code": "75000",
         "country": "France"
-    },
-    "total_amount": 29.99
+    }
 }

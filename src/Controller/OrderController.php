@@ -2,14 +2,15 @@
 
 namespace App\Controller;
 
-use App\Entity\Order;
 use App\Entity\Book;
+use App\Entity\Order;
+use App\Service\PriceCalculator;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/api/orders", name="api_orders_")
@@ -18,11 +19,13 @@ class OrderController extends AbstractController
 {
     private $entityManager;
     private $validator;
+    private $priceCalculator;
 
-    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, PriceCalculator $priceCalculator)
     {
         $this->entityManager = $entityManager;
         $this->validator = $validator;
+        $this->priceCalculator = $priceCalculator;
     }
 
     /**
@@ -52,14 +55,25 @@ class OrderController extends AbstractController
                 ], 404);
             }
 
+            // Calcul du prix en fonction du format
+            $format = $data['format'] ?? 'pdf';
+            try {
+                $totalAmount = $this->priceCalculator->calculatePrice($format);
+            } catch (\InvalidArgumentException $e) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Invalid format. Available formats: ' . implode(', ', $this->priceCalculator->getAvailableFormats())
+                ], 400);
+            }
+
             $order = new Order();
             $order->setUser($user);
             $order->setBook($book);
-            $order->setFormat($data['format'] ?? 'pdf');
+            $order->setFormat($format);
             $order->setStatus('pending');
             $order->setShippingAdress($data['shipping_address'] ?? []);
-            $order->setTotalAmount($data['total_amount'] ?? 0);
-
+            $order->setTotalAmount($totalAmount);
+            
             // Validation
             $errors = $this->validator->validate($order);
             if (count($errors) > 0) {
@@ -172,6 +186,7 @@ class OrderController extends AbstractController
             ], 500);
         }
     }
+    
     /**
      * @Route("/{id}", name="update", methods={"PUT"})
      */
@@ -185,7 +200,6 @@ class OrderController extends AbstractController
                 ], 403);
             }
 
-            // Vérifier si la commande peut être modifiée
             if ($order->getStatus() !== 'pending') {
                 return $this->json([
                     'status' => 'error',
@@ -202,8 +216,23 @@ class OrderController extends AbstractController
                 ], 400);
             }
 
-            $order->setFormat($data['format'] ?? $order->getFormat());
-            $order->setShippingAdress($data['shipping_address'] ?? $order->getShippingAdress());
+            // Si le format change, on recalcule le prix
+            if (isset($data['format']) && $data['format'] !== $order->getFormat()) {
+                try {
+                    $newPrice = $this->priceCalculator->calculatePrice($data['format']);
+                    $order->setFormat($data['format']);
+                    $order->setTotalAmount($newPrice);
+                } catch (\InvalidArgumentException $e) {
+                    return $this->json([
+                        'status' => 'error',
+                        'message' => 'Invalid format. Available formats: ' . implode(', ', $this->priceCalculator->getAvailableFormats())
+                    ], 400);
+                }
+            }
+
+            if (isset($data['shipping_address'])) {
+                $order->setShippingAdress($data['shipping_address']);
+            }
 
             $errors = $this->validator->validate($order);
             if (count($errors) > 0) {
