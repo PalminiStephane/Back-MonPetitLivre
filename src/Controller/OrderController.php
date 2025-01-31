@@ -311,9 +311,9 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/pay", name="pay", methods={"POST"})
+     * @Route("/{id}/checkout", name="checkout", methods={"POST"})
      */
-    public function initiatePayment(Order $order): JsonResponse
+    public function createCheckoutSession(Order $order): JsonResponse
     {
         try {
             if ($order->getUser() !== $this->getUser()) {
@@ -330,15 +330,19 @@ class OrderController extends AbstractController
                 ], 400);
             }
 
-            $paymentInfo = $this->stripeService->createPaymentIntent($order);
+            $successUrl = "http://votredomaine.com/success?order_id={$order->getId()}";
+            $cancelUrl = "http://votredomaine.com/cancel?order_id={$order->getId()}";
+
+            $session = $this->stripeService->createCheckoutSession(
+                $order,
+                $successUrl,
+                $cancelUrl
+            );
 
             return $this->json([
                 'status' => 'success',
                 'data' => [
-                    'clientSecret' => $paymentInfo['clientSecret'],
-                    'publicKey' => $this->getParameter('app.stripe_public_key'),
-                    'amount' => $order->getTotalAmount(),
-                    'currency' => 'eur'
+                    'checkoutUrl' => $session->url
                 ]
             ]);
 

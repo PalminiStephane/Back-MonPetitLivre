@@ -4,36 +4,41 @@ namespace App\Service;
 
 use App\Entity\Order;
 use Stripe\Stripe;
-use Stripe\PaymentIntent;
+use Stripe\Checkout\Session;
 
 class StripeService
 {
     private $privateKey;
+    private $webhookSecret;
 
-    public function __construct(string $stripeSecretKey)
+    public function __construct(string $stripeSecretKey, string $webhookSecret)
     {
         $this->privateKey = $stripeSecretKey;
+        $this->webhookSecret = $webhookSecret;
         Stripe::setApiKey($this->privateKey);
     }
 
-    public function createPaymentIntent(Order $order): array
+    public function createCheckoutSession(Order $order, string $successUrl, string $cancelUrl): Session
     {
-        try {
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $order->getTotalAmount() * 100, // Stripe utilise les centimes
-                'currency' => 'eur',
-                'metadata' => [
-                    'order_id' => $order->getId(),
-                    'book_id' => $order->getBook()->getId()
-                ]
-            ]);
-
-            return [
-                'clientSecret' => $paymentIntent->client_secret,
-                'paymentIntentId' => $paymentIntent->id,
-            ];
-        } catch (\Exception $e) {
-            throw new \Exception('Erreur lors de la création du paiement: ' . $e->getMessage());
-        }
+        return Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'eur',
+                    'unit_amount' => $order->getTotalAmount() * 100,
+                    'product_data' => [
+                        'name' => $order->getBook()->getTitle(),
+                        'description' => 'Format: ' . $order->getFormat()
+                    ],
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'metadata' => [
+                'order_id' => $order->getId()
+            ],
+        ]);
     }
 }

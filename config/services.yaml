@@ -22,6 +22,7 @@ services:
     App\Service\StripeService:
         arguments:
             $stripeSecretKey: '%app.stripe_secret_key%'
+            $webhookSecret: '%app.stripe_webhook_secret%'
 
     # Configurez le PriceCalculator s'il n'est pas déjà configuré
     App\Service\PriceCalculator:
