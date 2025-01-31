@@ -36,6 +36,8 @@ security:
                 path: app_logout
 
     access_control:
+        # Route de webhook Stripe accessible sans token
+        - { path: ^/api/webhook/stripe, roles: PUBLIC_ACCESS }
         # Route de login accessible sans token
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         # Le reste de l'API nécessite un token

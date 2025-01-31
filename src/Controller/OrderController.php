@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Book;
 use App\Entity\Order;
+use App\Service\StripeService;
 use App\Service\PriceCalculator;
+use Symfony\Bundle\MakerBundle\Str;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,12 +22,14 @@ class OrderController extends AbstractController
     private $entityManager;
     private $validator;
     private $priceCalculator;
+    private $stripeService;
 
-    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, PriceCalculator $priceCalculator)
+    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, PriceCalculator $priceCalculator, StripeService $stripeService)
     {
         $this->entityManager = $entityManager;
         $this->validator = $validator;
         $this->priceCalculator = $priceCalculator;
+        $this->stripeService = $stripeService;
     }
 
     /**
@@ -73,7 +77,7 @@ class OrderController extends AbstractController
             $order->setStatus('pending');
             $order->setShippingAdress($data['shipping_address'] ?? []);
             $order->setTotalAmount($totalAmount);
-            
+
             // Validation
             $errors = $this->validator->validate($order);
             if (count($errors) > 0) {
@@ -296,6 +300,46 @@ class OrderController extends AbstractController
             return $this->json([
                 'status' => 'success',
                 'message' => 'Order deleted successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @Route("/{id}/pay", name="pay", methods={"POST"})
+     */
+    public function initiatePayment(Order $order): JsonResponse
+    {
+        try {
+            if ($order->getUser() !== $this->getUser()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Access denied'
+                ], 403);
+            }
+
+            if ($order->getStatus() !== 'pending') {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Order cannot be paid'
+                ], 400);
+            }
+
+            $paymentInfo = $this->stripeService->createPaymentIntent($order);
+
+            return $this->json([
+                'status' => 'success',
+                'data' => [
+                    'clientSecret' => $paymentInfo['clientSecret'],
+                    'publicKey' => $this->getParameter('app.stripe_public_key'),
+                    'amount' => $order->getTotalAmount(),
+                    'currency' => 'eur'
+                ]
             ]);
 
         } catch (\Exception $e) {
