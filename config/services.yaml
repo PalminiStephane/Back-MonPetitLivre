@@ -27,3 +27,8 @@ services:
     # Configurez le PriceCalculator s'il n'est pas déjà configuré
     App\Service\PriceCalculator:
         autowire: true
+
+    # Configurez le FileUploader s'il n'est pas déjà configuré
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%kernel.project_dir%/public/uploads'
