@@ -1,10 +1,10 @@
 POST http://localhost:8000/api/books
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MzgyNDY2ODUsImV4cCI6MTczODI1MDI4NSwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20ifQ.t8CJ9o7mHUBiON6jLAmSUztDRHehekco99Y2jkEnos-KMPAPFc92QGdAM76csKkfwAxrdHtZrpDUvreKPtDxkL_GVr8GgSyE6NG1fusuF10WaHg5zXhTXiPx-Mmw0zcruUC-EjLqIq49V3MuAX-Mh-4QjTMn0uo-kEdWk6LHJHLG5Nf124eLjD3ZpQWqQRUVJhgdRfrGYI_3G9GvwMPaNN3kc8ZfnJST44aHop8rAvPdo0RmtwgRpW5-Wr_QHBH2bBqSOhdBnAFxK3uQRJbOl4oneC76csFBXDpvCQzFJkgTba_0e3FvUNmSFjXyMGvXPlnxcmPmv3EGS8JGgAB39A
-Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3Mzg0NTU0ODAsImV4cCI6MTczODQ1OTA4MCwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20ifQ.fAw8Q2GgnqSaUMpcfuyzwPrPzNMDlzXCaP87aOwgazZ6P625o2jFn-ZA2lORGeEtAfBxKoaoIevjk9e6eTfk5qrBvkunc-CiW7YzMKTMS_0aU5kTDI-nO7klnoK13JTA8ysivfWN7b9sUVmJPfNlylQTCnNsMwLiSop3M6xjgVSbZjqf6CvZE6Z6W64q7x9_Hsvz2b-Fk2pdyTKwNuHtdUjivw_c7bDibzKLYlX5e9tKdFpU5WKDgp7DDu8ZdZ1P8Hn-uOq0BKLFbNMjMuMKQrZmbStI5RD9dzkS2X_oVBKWVXROWL0ZRz02mTu-xqWkiqlGTlKi3KwfTCmJ9Wht1Q
 
 {
-    "title": "Livre test pour suppression",
-    "child_name": "Test",
-    "child_age": 7,
-    "theme": "adventure"
+    "title": "Livre test",
+    "child_name": "Silvio",
+    "child_age": 8,
+    "theme": "adventure",
+    "content": "Il était une fois..."
 }

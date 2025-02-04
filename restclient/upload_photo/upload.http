@@ -1,10 +1,11 @@
-### Upload d'une photo vers /api/upload/photo
+### Upload d'une photo
 POST http://localhost:8000/api/upload/photo
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3Mzg0NDk3MTIsImV4cCI6MTczODQ1MzMxMiwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20ifQ.lNBX1XiVhmMmxgGujzCvx-g11YNZayG1Sma4GcLgvjGeZIrSfrIV8mU8xa2ddJTwNjJIewG9LdL0iKLJ02ZTXIaQRd3GmPmtTWnqqHfqVJpi5AO34KYI3sMwcDZbAAhjunLPzJkg5lJtuw0j0gcSvrk74RxXW33-BRRj35WNmU0i_yhgzkZTn6f-1acwjE4l5rARLhYH-nHzOun8YPz2mkgraYbSbCPXHRqwt-gMdvqDg_WUUSxdSJqpISRv_nobFSrbJG0B64zw_ouYxCWvjT3Ei5C0RZBit388JL9OiEelIKBZPsQWkTSV3hbgPAuRwWTxEHQ2XkAQoQedAZlyeQ
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="photo"; filename="logo-judo.jpg"
 Content-Type: image/jpeg
 
-@./logo-judo.jpg
+< ./logo-judo.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--

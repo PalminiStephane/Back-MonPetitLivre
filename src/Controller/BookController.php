@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Service\PdfGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -256,5 +258,31 @@ class BookController extends AbstractController
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+    /**
+     * @Route("/{id}/pdf", name="book_pdf")
+     */
+    public function generatePdf(Book $book, PdfGenerator $pdfGenerator): Response
+    {   
+        // Vérifiez que le livre appartient bien à l'utilisateur connecté
+        if ($book->getUser() !== $this->getUser()) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Access denied'
+            ], 403);
+        }
+        
+        // Préparez les données à passer au template.
+        // Ici, nous passons l'objet book directement.
+        $data = [
+            'book' => $book
+        ];
+
+        // Générez et affichez le PDF dans le navigateur (mode stream inline)
+        return new Response(
+            $pdfGenerator->generatePdf('pdf/book.html.twig', $data, 'stream', 'livre_personnalise.pdf'),
+            200,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 }

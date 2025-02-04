@@ -1,12 +1,42 @@
+{# templates/pdf/book.html.twig #}
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>{{ book.title }}</title>
+    <meta charset="UTF-8">
+    <title>Livre personnalisé</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .content { margin: 0 20px; }
+        .footer { position: fixed; bottom: 0; text-align: center; font-size: 10px; }
+    </style>
 </head>
 <body>
-  <h1>{{ book.title }}</h1>
-  <p>Auteur : {{ book.author }}</p>
-  <p>Description : {{ book.description }}</p>
+    <div class="header">
+        <h1>Livre personnalisé pour {{ book.childName }}</h1>
+    </div>
+
+    <div class="content">
+        <p><strong>Âge :</strong> {{ book.childAge }} ans</p>
+        <p><strong>Histoire :</strong></p>
+        <p>{{ book.content|join('<br>')|raw }}</p>
+
+        {# Si vous souhaitez afficher la photo de l'enfant (attention au chemin ou URL) #}
+        {% if book.childPhoto %}
+            <img src="{{ book.childPhoto }}" alt="Photo de l'enfant" style="max-width: 100%; height: auto;">
+        {% endif %}
+
+        {# Vous pouvez aussi parcourir les images générées par DALL·E si stockées en JSON #}
+        {% if book.generatedImages is defined and book.generatedImages %}
+            <h3>Illustrations</h3>
+            {% for imageUrl in book.generatedImages %}
+                <img src="{{ imageUrl }}" alt="Illustration" style="max-width: 100%; height: auto; margin-bottom: 10px;">
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>© {{ "now"|date("Y") }} Mon Application de Livres Personnalisés</p>
+    </div>
 </body>
 </html>
