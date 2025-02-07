@@ -10,7 +10,6 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
     # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
         exclude:
@@ -24,15 +23,43 @@ services:
             $stripeSecretKey: '%app.stripe_secret_key%'
             $webhookSecret: '%app.stripe_webhook_secret%'
 
-    # Configurez le PriceCalculator s'il n'est pas déjà configuré
+    # Configurez le PriceCalculator
     App\Service\PriceCalculator:
         autowire: true
 
-    # Configurez le FileUploader s'il n'est pas déjà configuré
+    # Configurez le FileUploader
     App\Service\FileUploader:
         arguments:
             $targetDirectory: '%kernel.project_dir%/public/uploads'
 
+    # Configuration du PDF Generator
     App\Service\PdfGenerator:
         arguments:
             $twig: '@twig'
+
+    # Configuration des services OpenAI
+    App\Service\ChatGPTGenerator:
+        arguments:
+            $apiKey: '%env(OPENAI_API_KEY)%'
+
+    App\Service\DallEGenerator:
+        arguments:
+            $apiKey: '%env(OPENAI_API_KEY)%'
+
+    # Configuration complète du BookGenerator
+    App\Service\BookGenerator:
+        arguments:
+            $chatGPTGenerator: '@App\Service\ChatGPTGenerator'
+            $dallEGenerator: '@App\Service\DallEGenerator'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $serializer: '@serializer'
+            $security: '@security.helper'
+            $projectDir: '%kernel.project_dir%'
+
+    # Logger pour le PDF
+    pdf_logger:
+        class: Symfony\Bridge\Monolog\Logger
+        arguments:
+            $name: 'pdf_generator'
+        tags:
+            - { name: monolog.logger, channel: pdf_generator }

@@ -1,0 +1,10 @@
+### Générer un livre
+POST http://localhost:8000/api/books/generate
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3Mzg5NjU5MTEsImV4cCI6MTczODk2OTUxMSwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20ifQ.YzZRAd3RQ2bC8ZH7RME8Esi_rcCWYLk_KhmmIYJeKjnESAgL4ZSxQbSpomYR26NH1_Yg2_U-gvgnf1EkatmbKdrTsmKK5pJa2IALH3IeDmJZYu8SQ8VMxeqJMDHfKGhq9tadwcvHiN66omZRsNQwruVuX9mJbI0Jz1v7t-7ja0l7cdFq6Iwe5C2zsW2jeOMejuqSnjaLv1t5AHDBbsQcGvOuvnyWlRrJDlC-sqf2SNUgXV4avJnwAdo5L54wp-oC0rqAnrZ9XyUA1_EIr0ZoMFIQPoxZj0yh8gaeo2YMG55dxJxu84Un0QDQ1XqBUAMUVSfbs9gmmPtzJiLqO0kpAA
+Content-Type: application/json
+
+{
+    "child_name": "Ennio",
+    "child_age": 78,
+    "theme": "pirate"
+}

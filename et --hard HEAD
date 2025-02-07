@@ -1,0 +1,148 @@
+[1mdiff --git a/composer.json b/composer.json[m
+[1mindex 61d28c1..ebcd537 100644[m
+[1m--- a/composer.json[m
+[1m+++ b/composer.json[m
+[36m@@ -20,9 +20,12 @@[m
+         "symfony/dotenv": "5.4.*",[m
+         "symfony/flex": "^1.17|^2",[m
+         "symfony/framework-bundle": "5.4.*",[m
+[32m+[m[32m        "symfony/http-client": "5.4.*",[m
+         "symfony/mime": "5.4.*",[m
+[32m+[m[32m        "symfony/monolog-bundle": "*",[m
+         "symfony/runtime": "5.4.*",[m
+         "symfony/security-bundle": "5.4.*",[m
+[32m+[m[32m        "symfony/serializer": "5.4.*",[m
+         "symfony/twig-bundle": "5.4.*",[m
+         "symfony/validator": "5.4.*",[m
+         "symfony/yaml": "5.4.*",[m
+[1mdiff --git a/composer.lock b/composer.lock[m
+[1mindex be8f866..649483a 100644[m
+[1m--- a/composer.lock[m
+[1m+++ b/composer.lock[m
+[36m@@ -4,7 +4,7 @@[m
+         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",[m
+         "This file is @generated automatically"[m
+     ],[m
+[31m-    "content-hash": "a234e436c0ebc31d49b2ae6a233efc44",[m
+[32m+[m[32m    "content-hash": "457b66bcc1c3e88d51eef44e79c5bed4",[m
+     "packages": [[m
+         {[m
+             "name": "doctrine/annotations",[m
+[36m@@ -2008,6 +2008,108 @@[m
+             },[m
+             "time": "2024-03-31T07:05:07+00:00"[m
+         },[m
+[32m+[m[32m        {[m
+[32m+[m[32m            "name": "monolog/monolog",[m
+[32m+[m[32m            "version": "2.10.0",[m
+[32m+[m[32m            "source": {[m
+[32m+[m[32m                "type": "git",[m
+[32m+[m[32m                "url": "https://github.com/Seldaek/monolog.git",[m
+[32m+[m[32m                "reference": "5cf826f2991858b54d5c3809bee745560a1042a7"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "dist": {[m
+[32m+[m[32m                "type": "zip",[m
+[32m+[m[32m                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/5cf826f2991858b54d5c3809bee745560a1042a7",[m
+[32m+[m[32m                "reference": "5cf826f2991858b54d5c3809bee745560a1042a7",[m
+[32m+[m[32m                "shasum": ""[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "require": {[m
+[32m+[m[32m                "php": ">=7.2",[m
+[32m+[m[32m                "psr/log": "^1.0.1 || ^2.0 || ^3.0"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "provide": {[m
+[32m+[m[32m                "psr/log-implementation": "1.0.0 || 2.0.0 || 3.0.0"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "require-dev": {[m
+[32m+[m[32m                "aws/aws-sdk-php": "^2.4.9 || ^3.0",[m
+[32m+[m[32m                "doctrine/couchdb": "~1.0@dev",[m
+[32m+[m[32m                "elasticsearch/elasticsearch": "^7 || ^8",[m
+[32m+[m[32m                "ext-json": "*",[m
+[32m+[m[32m                "graylog2/gelf-php": "^1.4.2 || ^2@dev",[m
+[32m+[m[32m                "guzzlehttp/guzzle": "^7.4",[m
+[32m+[m[32m                "guzzlehttp/psr7": "^2.2",[m
+[32m+[m[32m                "mongodb/mongodb": "^1.8",[m
+[32m+[m[32m                "php-amqplib/php-amqplib": "~2.4 || ^3",[m
+[32m+[m[32m                "phpspec/prophecy": "^1.15",[m
+[32m+[m[32m                "phpstan/phpstan": "^1.10",[m
+[32m+[m[32m                "phpunit/phpunit": "^8.5.38 || ^9.6.19",[m
+[32m+[m[32m                "predis/predis": "^1.1 || ^2.0",[m
+[32m+[m[32m                "rollbar/rollbar": "^1.3 || ^2 || ^3",[m
+[32m+[m[32m                "ruflin/elastica": "^7",[m
+[32m+[m[32m                "swiftmailer/swiftmailer": "^5.3|^6.0",[m
+[32m+[m[32m                "symfony/mailer": "^5.4 || ^6",[m
+[32m+[m[32m                "symfony/mime": "^5.4 || ^6"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "suggest": {[m
+[32m+[m[32m                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",[m
+[32m+[m[32m                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",[m
+[32m+[m[32m                "elasticsearch/elasticsearch": "Allow sending log messages to an Elasticsearch server via official client",[m
+[32m+[m[32m                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",[m
+[32m+[m[32m                "ext-curl": "Required to send log messages using the IFTTTHandler, the LogglyHandler, the SendGridHandler, the SlackWebhookHandler or the TelegramBotHandler",[m
+[32m+[m[32m                "ext-mbstring": "Allow to work properly with unicode symbols",[m
+[32m+[m[32m                "ext-mongodb": "Allow sending log messages to a MongoDB server (via driver)",[m
+[32m+[m[32m                "ext-openssl": "Required to send log messages using SSL",[m
+[32m+[m[32m                "ext-sockets": "Allow sending log messages to a Syslog server (via UDP driver)",[m
+[32m+[m[32m                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",[m
+[32m+[m[32m                "mongodb/mongodb": "Allow sending log messages to a MongoDB server (via library)",[m
+[32m+[m[32m                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",[m
+[32m+[m[32m                "rollbar/rollbar": "Allow sending log messages to Rollbar",[m
+[32m+[m[32m                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "type": "library",[m
+[32m+[m[32m            "extra": {[m
+[32m+[m[32m                "branch-alias": {[m
+[32m+[m[32m                    "dev-main": "2.x-dev"[m
+[32m+[m[32m                }[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "autoload": {[m
+[32m+[m[32m                "psr-4": {[m
+[32m+[m[32m                    "Monolog\\": "src/Monolog"[m
+[32m+[m[32m                }[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "notification-url": "https://packagist.org/downloads/",[m
+[32m+[m[32m            "license": [[m
+[32m+[m[32m                "MIT"[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "authors": [[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    "name": "Jordi Boggiano",[m
+[32m+[m[32m                    "email": "j.boggiano@seld.be",[m
+[32m+[m[32m                    "homepage": "https://seld.be"[m
+[32m+[m[32m                }[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",[m
+[32m+[m[32m            "homepage": "https://github.com/Seldaek/monolog",[m
+[32m+[m[32m            "keywords": [[m
+[32m+[m[32m                "log",[m
+[32m+[m[32m                "logging",[m
+[32m+[m[32m                "psr-3"[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "support": {[m
+[32m+[m[32m                "issues": "https://github.com/Seldaek/monolog/issues",[m
+[32m+[m[32m                "source": "https://github.com/Seldaek/monolog/tree/2.10.0"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "funding": [[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    "url": "https://github.com/Seldaek",[m
+[32m+[m[32m                    "type": "github"[m
+[32m+[m[32m                },[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    "url": "https://tidelift.com/funding/github/packagist/monolog/monolog",[m
+[32m+[m[32m                    "type": "tidelift"[m
+[32m+[m[32m                }[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "time": "2024-11-12T12:43:37+00:00"[m
+[32m+[m[32m        },[m
+         {[m
+             "name": "namshi/jose",[m
+             "version": "7.2.3",[m
+[36m@@ -3829,6 +3931,175 @@[m
+             ],[m
+             "time": "2024-10-22T13:05:35+00:00"[m
+         },[m
+[32m+[m[32m        {[m
+[32m+[m[32m            "name": "symfony/http-client",[m
+[32m+[m[32m            "version": "v5.4.49",[m
+[32m+[m[32m            "source": {[m
+[32m+[m[32

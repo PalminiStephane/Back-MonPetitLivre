@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use Psr\Log\LoggerInterface;
 use App\Service\PdfGenerator;
+use App\Service\BookGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -148,7 +150,8 @@ class BookController extends AbstractController
                     'child_name' => $book->getChildName(),
                     'child_age' => $book->getChildAge(),
                     'theme' => $book->getTheme(),
-                    'status' => $book->getStatus()
+                    'status' => $book->getStatus(),
+                    'content' => $book->getContent()
                 ]
             ]);
 
@@ -259,30 +262,112 @@ class BookController extends AbstractController
             ], 500);
         }
     }
+
     /**
-     * @Route("/{id}/pdf", name="book_pdf")
+     * @Route("/{id}/pdf", name="api_book_pdf", methods={"GET"})
      */
-    public function generatePdf(Book $book, PdfGenerator $pdfGenerator): Response
-    {   
-        // Vérifiez que le livre appartient bien à l'utilisateur connecté
-        if ($book->getUser() !== $this->getUser()) {
+    public function generatePdf(Book $book, PdfGenerator $pdfGenerator, LoggerInterface $pdfLogger): Response
+    {
+        try {
+            // Vérifier que le livre appartient bien à l'utilisateur connecté
+            if ($book->getUser() !== $this->getUser()) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Access denied'
+                ], Response::HTTP_FORBIDDEN);
+            }
+
+            $pdfLogger->info('Début de la génération du PDF pour le livre', [
+                'book_id' => $book->getId(),
+                'title' => $book->getTitle()
+            ]);
+
+            $bookContent = $book->getContent();
+            
+            if (is_string($bookContent)) {
+                $bookContent = json_decode($bookContent, true);
+            }
+
+            $pdfLogger->debug('Structure du contenu du livre', [
+                'content_keys' => is_array($bookContent) ? array_keys($bookContent) : 'not array',
+                'content_type' => gettype($bookContent),
+                'sample' => is_array($bookContent) ? json_encode(array_slice($bookContent, 0, 2)) : 'not array'
+            ]);
+
+            if (!is_array($bookContent)) {
+                throw new \InvalidArgumentException('Le contenu du livre doit être un tableau');
+            }
+
+            $pdfData = [
+                'book' => $book,
+                'bookContent' => $bookContent
+            ];
+
+            $filename = sprintf(
+                '%s_%s.pdf',
+                $this->slugify($book->getTitle()),
+                date('Y-m-d')
+            );
+
+            return $pdfGenerator->generatePdfResponse($pdfData, $filename);
+
+        } catch (\Exception $e) {
+            $pdfLogger->error('Erreur lors de la génération du PDF', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return $this->json([
                 'status' => 'error',
-                'message' => 'Access denied'
-            ], 403);
+                'message' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        // Préparez les données à passer au template.
-        // Ici, nous passons l'objet book directement.
-        $data = [
-            'book' => $book
-        ];
+    }
 
-        // Générez et affichez le PDF dans le navigateur (mode stream inline)
-        return new Response(
-            $pdfGenerator->generatePdf('pdf/book.html.twig', $data, 'stream', 'livre_personnalise.pdf'),
-            200,
-            ['Content-Type' => 'application/pdf']
-        );
+    /**
+     * @Route("/generate", name="api_generate_book", methods={"POST"})
+     */
+    public function generateBook(Request $request, BookGenerator $bookGenerator): Response
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $book = $bookGenerator->generateBook(
+                $data['child_name'],
+                $data['child_age'],
+                $data['theme']
+            );
+
+            return $this->json([
+                'status' => 'success',
+                'data' => $book
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function slugify(string $text): string
+    {
+        // Remplacer les caractères non alphanumériques
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        
+        // Translittération
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        
+        // Supprimer les caractères indésirables
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        
+        // Supprimer les tirets en début et fin
+        $text = trim($text, '-');
+        
+        // Convertir en minuscules
+        $text = strtolower($text);
+        
+        // Si la chaîne est vide, retourner 'book'
+        return empty($text) ? 'book' : $text;
     }
 }

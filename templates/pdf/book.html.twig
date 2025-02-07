@@ -3,40 +3,89 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Livre personnalisé</title>
+    <title>{{ bookContent.title }}</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .content { margin: 0 20px; }
-        .footer { position: fixed; bottom: 0; text-align: center; font-size: 10px; }
+        @page {
+            margin: 2cm;
+            size: A4 portrait;
+        }
+        body { 
+            font-family: DejaVu Sans, Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3cm;
+        }
+        h1 {
+            font-size: 24pt;
+            margin-bottom: 1cm;
+            color: #333;
+        }
+        h3 {
+            font-size: 16pt;
+            margin-top: 1cm;
+            margin-bottom: 0.5cm;
+        }
+        .content {
+            margin: 0 1cm;
+        }
+        .page {
+            page-break-after: always;
+            padding: 1cm 0;
+        }
+        .page:last-child {
+            page-break-after: avoid;
+        }
+        img {
+            max-width: 90%;
+            height: auto !important;
+            display: block;
+            margin: 1cm auto;
+        }
+        .text-content {
+            margin: 1cm 0;
+            text-align: justify;
+        }
+        .conclusion {
+            margin-top: 2cm;
+            font-style: italic;
+            text-align: center;
+            padding: 1cm;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Livre personnalisé pour {{ book.childName }}</h1>
+    <!-- Page de couverture -->
+    <div class="page">
+        <div class="header">
+            <h1>{{ bookContent.title }}</h1>
+            {% if bookContent.coverImageUrl is defined and bookContent.coverImageUrl %}
+                <img src="{{ bookContent.coverImageUrl }}" alt="Couverture">
+            {% endif %}
+        </div>
     </div>
-
-    <div class="content">
-        <p><strong>Âge :</strong> {{ book.childAge }} ans</p>
-        <p><strong>Histoire :</strong></p>
-        <p>{{ book.content|join('<br>')|raw }}</p>
-
-        {# Si vous souhaitez afficher la photo de l'enfant (attention au chemin ou URL) #}
-        {% if book.childPhoto %}
-            <img src="{{ book.childPhoto }}" alt="Photo de l'enfant" style="max-width: 100%; height: auto;">
-        {% endif %}
-
-        {# Vous pouvez aussi parcourir les images générées par DALL·E si stockées en JSON #}
-        {% if book.generatedImages is defined and book.generatedImages %}
-            <h3>Illustrations</h3>
-            {% for imageUrl in book.generatedImages %}
-                <img src="{{ imageUrl }}" alt="Illustration" style="max-width: 100%; height: auto; margin-bottom: 10px;">
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    <div class="footer">
-        <p>© {{ "now"|date("Y") }} Mon Application de Livres Personnalisés</p>
-    </div>
+    <!-- Pages de contenu -->
+    {% for page in bookContent.pages %}
+        <div class="page">
+            <div class="text-content">
+                {{ page.text|nl2br }}
+            </div>
+            {% if page.imageUrl is defined and page.imageUrl %}
+                <img src="{{ page.imageUrl }}" alt="Illustration page {{ loop.index }}">
+            {% endif %}
+        </div>
+    {% endfor %}
+    <!-- Conclusion -->
+    {% if bookContent.conclusion is defined and bookContent.conclusion %}
+        <div class="page">
+            <div class="conclusion">
+                {{ bookContent.conclusion|nl2br }}
+            </div>
+        </div>
+    {% endif %}
 </body>
 </html>
